@@ -25,8 +25,9 @@ RUN npm ci --omit=dev
 COPY --from=builder /srv/hioshop/app ./app
 COPY --from=builder /srv/hioshop/view ./view
 COPY --from=builder /srv/hioshop/www ./www
-COPY --from=builder /srv/hioshop/runtime ./runtime
 COPY --from=builder /srv/hioshop/production.js ./production.js
+
+RUN mkdir -p runtime
 
 EXPOSE 8360
 
