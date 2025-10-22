@@ -14,7 +14,7 @@ services:
       - beisi-shared-network
 
   hioshop:
-    image: caddy:2-alpine
+    image: caddy:latest
     container_name: hioshop
     depends_on:
       - server

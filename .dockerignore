@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+docker
+.git
+.gitignore
+.vscode
+hiolabsDB.sql
+*.log

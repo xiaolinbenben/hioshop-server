@@ -1,22 +1,33 @@
-FROM node:18-alpine
+FROM node:20-alpine AS builder
+
+ENV TZ=Asia/Shanghai
 
 WORKDIR /srv/hioshop
 
-ENV NODE_ENV=production \
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run compile
+
+FROM node:20-alpine AS runner
+
+ENV TZ=Asia/Shanghai \
+    NODE_ENV=production \
     PORT=8360 \
     HOST=0.0.0.0
 
-COPY package.json package-lock.json ./
-COPY node_modules ./node_modules
-COPY app ./app
-COPY view ./view
-COPY www ./www
-COPY runtime ./runtime
-COPY production.js ./production.js
-COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+WORKDIR /srv/hioshop
 
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /srv/hioshop/app ./app
+COPY --from=builder /srv/hioshop/view ./view
+COPY --from=builder /srv/hioshop/www ./www
+COPY --from=builder /srv/hioshop/runtime ./runtime
+COPY --from=builder /srv/hioshop/production.js ./production.js
 
 EXPOSE 8360
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["node", "production.js"]
