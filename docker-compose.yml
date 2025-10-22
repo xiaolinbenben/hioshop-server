@@ -1,6 +1,6 @@
 services:
   server:
-    build: .
+    image: beisitech/hioshop-server:latest
     container_name: hioshop-server
     environment:
       NODE_ENV: production
