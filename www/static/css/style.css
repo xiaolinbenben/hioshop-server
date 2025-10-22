@@ -252,12 +252,31 @@ body {
  }
 
  .qr-card {
-  width: 100%;
-  max-width: 260px;
+ width: 100%;
+ max-width: 260px;
  }
 
  .qr-card img {
   width: 180px;
   height: 180px;
+ }
+}
+
+@media (max-width: 480px) {
+ .contact-list {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+ }
+
+ .contact-item {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 6px;
+ }
+
+ .contact-link {
+  word-break: break-all;
  }
 }
