@@ -1,6 +1,12 @@
 :80 {
     encode gzip zstd
 
+    handle /static/* {
+        root * /srv/hioshop/www
+        try_files {path} {path}/index.html
+        file_server
+    }
+
     handle_path /api/* {
         reverse_proxy server:8360
     }
@@ -10,9 +16,7 @@
     }
 
     handle {
-        root * /srv/hioshop/www
-        try_files {path} /index.html
-        file_server
+        reverse_proxy server:8360
     }
 
     log {
