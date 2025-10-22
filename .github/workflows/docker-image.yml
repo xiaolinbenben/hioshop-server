@@ -1,0 +1,47 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      TZ: Asia/Shanghai
+      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+      IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set image tag
+        run: echo "TAG=$(date +%Y%m%d)-${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Log in to Docker Hub
+        if: ${{ github.event_name == 'push' }}
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USER }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build . \
+            -t ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
+      - name: Tag and Push (date tag + latest)
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          docker tag ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} \
+                     ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest
+
+          docker push ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          docker push ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Show pushed image info
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo "✅ Image pushed:"
+          echo " - ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}"
+          echo " - ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest"
