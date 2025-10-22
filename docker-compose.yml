@@ -22,7 +22,6 @@ services:
       - "80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./www:/srv/hioshop/www:ro
     restart: unless-stopped
     networks:
       - beisi-shared-network
